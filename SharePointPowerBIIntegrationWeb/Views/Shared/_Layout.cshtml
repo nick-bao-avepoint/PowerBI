@@ -1,4 +1,48 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.IdentityModel.Clients.ActiveDirectory;
+@using System.Configuration;
+@using System.Collections.Specialized;
+
+@{
+    string accessToken = string.Empty;
+    string username = string.Empty;
+    AuthenticationResult authenticationResult = Session["authResult"] as AuthenticationResult;
+    if (authenticationResult != null)
+    {
+        accessToken = authenticationResult.AccessToken;
+        username = authenticationResult.UserInfo.GivenName;
+    }
+}
+
+@{
+    var param = new NameValueCollection
+            {
+                //Azure AD will return an authorization code.
+                //See the Redirect class to see how "code" is used to AcquireTokenByAuthorizationCode
+                {"response_type", "code"},
+
+                //Client ID is used by the application to identify themselves to the users that they are requesting permissions from.
+                //You get the client id when you register your Azure app.
+                {"client_id", ConfigurationManager.AppSettings["ClientId"]},
+
+                //Resource uri to the Power BI resource to be authorized
+                {"resource", "https://analysis.windows.net/powerbi/api"},
+
+                //After user authenticates, Azure AD will redirect back to the web app
+                {"redirect_uri", ConfigurationManager.AppSettings["ReplyUrl"]}
+            };
+
+    //Create sign-in query string
+    var queryString = HttpUtility.ParseQueryString(string.Empty);
+    queryString.Add(param);
+
+    //Redirect authority
+    //Authority Uri is an Azure resource that takes a client id to get an Access token
+    string authorityUri = "https://login.windows.net/common/oauth2/authorize/";
+    var authUri = String.Format("{0}?{1}", authorityUri, queryString);
+}
+
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,6 +50,9 @@
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+
+    <link href='@ViewBag.SPHostUrl/_layouts/15/defaultcss.ashx' type='text/css' rel='stylesheet' />
+    <script src='@ViewBag.SPHostUrl/_layouts/15/SP.UI.Controls.js'></script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -16,14 +63,25 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Power BI Embeded in SP Add-in", "Dashboard", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
+            <div class="navbar-collapse navbar-left collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+@*<li>@Html.ActionLink("About", "About", "Home")</li>
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
+                    <li>@Html.ActionLink("Dashboard", "Dashboard", "Home")</li>
                 </ul>
+            </div>
+            @*<div class=".navbar-right">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a id="loginLink" href="@authUri">Sign in</a>
+                    </li>
+                </ul>
+            </div>*@
+            <div class="navbar-text navbar-right">
+                <a id="loginLink" class="navbar-link" href="@authUri">Sign in Power BI</a>
             </div>
         </div>
     </div>
@@ -39,5 +97,19 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/spcontext")
     @RenderSection("scripts", required: false)
+
+    <script>
+        $(window).load(function () {
+            var username = "@username";
+            if (username != '') {
+                $("#loginLink").attr("href", '');
+                $("#loginLink").text(username);
+            }
+            else
+            {
+                window.open("@authUri");
+            }
+        });
+    </script>
 </body>
 </html>

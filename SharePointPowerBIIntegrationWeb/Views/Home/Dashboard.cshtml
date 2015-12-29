@@ -1,0 +1,58 @@
+﻿@using System.Configuration;
+@using System.Collections.Specialized;
+@using Microsoft.IdentityModel.Clients.ActiveDirectory;
+
+@*@{
+    ViewBag.Title = "Embeded Power BI Dashboard";
+}*@
+
+@{
+    string accessToken = string.Empty;
+    AuthenticationResult authenticationResult = Session["authResult"] as AuthenticationResult;
+    if (authenticationResult != null)
+    {
+        accessToken = authenticationResult.AccessToken;
+    }
+}
+
+
+@*<h2>@ViewBag.Title.</h2>*@
+@*<h3>@ViewBag.Message</h3>*@
+
+<script>
+    window.onload = function () {
+        var iframe = document.getElementById('iFrameEmbedTile');
+        var accessToken = "@accessToken";
+        if ("" != accessToken) {
+            iframe.src = "https://app.powerbi.com/reportEmbed?reportId=3a3684d2-f8b1-4eb8-98ab-354eb8b7d4cf";//embedUrl;
+            iframe.onload = postActionLoadReport;
+        }
+    };
+    function postActionLoadReport() {
+        // get the access token.
+        //accessToken = document.getElementById('MainContent_accessTokenTextbox').value;
+        //var accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBPWWlKSE1iYTlnb0VLWSIsImtpZCI6Ik1uQ19WWmNBVGZNNXBPWWlKSE1iYTlnb0VLWSJ9.eyJhdWQiOiJodHRwczovL2FuYWx5c2lzLndpbmRvd3MubmV0L3Bvd2VyYmkvYXBpIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvNGQwZDI2NmEtY2RmMi00MDMyLTkyYTYtMmIwMTU1Nzg1MDQ3LyIsImlhdCI6MTQ1MDMyODcyNSwibmJmIjoxNDUwMzI4NzI1LCJleHAiOjE0NTAzMzI2MjUsImFjciI6IjEiLCJhbXIiOlsicHdkIl0sImFwcGlkIjoiNzVlMTc4ZjktNmFiYi00YWVkLTkyYzUtMjQ4M2ZkMTIwNTIwIiwiYXBwaWRhY3IiOiIxIiwiZmFtaWx5X25hbWUiOiJEb2UiLCJnaXZlbl9uYW1lIjoiSm9obiIsImlwYWRkciI6IjQwLjc2LjIxOS4yNiIsIm5hbWUiOiJURVNUX1RFU1RfU1BPUHJvdkhlYXJ0YmVhdF9FM18xNV8xNTAzMTEyMDMwXzIyIiwib2lkIjoiOTBhMTk4NzAtOTAyMS00YWU5LThlNDgtMTE2ZjA4Mzg5MWY0IiwicHVpZCI6IjEwMDMwMDAwOEVDMEZBMEEiLCJzY3AiOiJDb250ZW50LkNyZWF0ZSBEYXNoYm9hcmQuUmVhZC5BbGwgRGF0YS5BbHRlcl9BbnkgRGF0YXNldC5SZWFkLkFsbCBEYXRhc2V0LlJlYWRXcml0ZS5BbGwgR3JvdXAuUmVhZC5BbGwgTWV0YWRhdGEuVmlld19BbnkgUmVwb3J0LlJlYWQuQWxsIiwic3ViIjoiS2NlaDYwRDZybUt1Y0tKVUpfcDdnU2VwZDZsU0tJcjFtTnFWMnMxTi1icyIsInRpZCI6IjRkMGQyNjZhLWNkZjItNDAzMi05MmE2LTJiMDE1NTc4NTA0NyIsInVuaXF1ZV9uYW1lIjoiYWRtaW5AYTgzMGVkYWQ5MDUwODQ5TkRBMzIzNC5vbm1pY3Jvc29mdC5jb20iLCJ1cG4iOiJhZG1pbkBhODMwZWRhZDkwNTA4NDlOREEzMjM0Lm9ubWljcm9zb2Z0LmNvbSIsInZlciI6IjEuMCJ9.kQ0-dh9BMNCunrSzWJ1g_N5Ufr5n0RV4Kgcw6uVQeKsHJNt7TlhAK__9JnNu04JsCacf0zM9VBYTBXaW0j5MbmlFwjTbt1UpUGXOJ8HHC5JPoAg8EDvL3w5B5U_RfGvRnKMk5e8Jp1UPB5mhJgk94VWFD2gUT7sRunag_zgX3CvdfzTH7CsjQclLrCm_dGtzWfVER7E00IcJ_DGT5IBMFchil8c0WhrZ5eraUtqlBkL4KW31Ooc9rF-wI9zOftmxKKYoWkcXUbElxusAgUh3YKqlix5f6jgSSTVTSnPMODmiyWqti4OMTdtIBoEUrulLsJQ_5N1elmc4xYugcWr4IQ";
+
+        var accessToken = "@accessToken";
+
+        if ("" === accessToken)
+            return;
+
+        // construct the push message structure
+        // this structure also supports setting the reportId, groupId, height, and width.
+        // when using a report in a group, you must provide the groupId on the iFrame SRC
+        var m = { action: "loadReport", accessToken: accessToken };
+        var message = JSON.stringify(m);
+
+        // push the message.
+        var iframe = document.getElementById('iFrameEmbedTile');
+        iframe.contentWindow.postMessage(message, "*");;
+    }
+</script>
+<div class="row">
+    
+</div>
+<div class="row">
+    <iframe id="iFrameEmbedTile" src="" height="680" width="980" frameborder="0" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes">
+    </iframe>
+</div>

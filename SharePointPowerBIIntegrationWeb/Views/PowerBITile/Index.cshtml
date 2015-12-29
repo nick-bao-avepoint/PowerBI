@@ -1,0 +1,103 @@
+﻿@using Microsoft.IdentityModel.Clients.ActiveDirectory;
+@{
+    Layout = null;
+}
+@model SharePointPowerBIIntegrationWeb.Models.TilesModel
+
+@{
+    string accessToken = string.Empty;
+    AuthenticationResult authenticationResult = Session["authResult"] as AuthenticationResult;
+    if (authenticationResult != null)
+    {
+        accessToken = authenticationResult.AccessToken;
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/spcontext")
+   
+    <script type="text/javascript">
+        // Set the style of the client web part page to be consistent with the host web.
+        (function () {
+            'use strict';
+
+            var hostUrl = '';
+            var link = document.createElement('link');
+            link.setAttribute('rel', 'stylesheet');
+            if (document.URL.indexOf('?') != -1) {
+                var params = document.URL.split('?')[1].split('&');
+                for (var i = 0; i < params.length; i++) {
+                    var p = decodeURIComponent(params[i]);
+                    if (/^SPHostUrl=/i.test(p)) {
+                        hostUrl = p.split('=')[1];
+                        link.setAttribute('href', hostUrl + '/_layouts/15/defaultcss.ashx');
+                        break;
+                    }
+                }
+            }
+            if (hostUrl == '') {
+                link.setAttribute('href', '/_layouts/15/1033/styles/themable/corev15.css');
+            }
+            document.head.appendChild(link);
+        })();
+        $(document).ready(function () {
+            $("#selectTile").change(reloadTile);
+            reloadTile();
+        });
+        function reloadTile()
+        {
+            var uri = $("#selectTile").val();
+            $("#iFrameEmbedTile").attr("src", uri);
+            $("#iFrameEmbedTile").load(postActionLoadTile);
+        }
+        function postActionLoadTile() {
+            // get the access token.
+            var accessToken = "@accessToken";
+
+            if ("" === accessToken)
+                return;
+
+            var h = 300;
+            var w = 600;
+
+            // construct the post message structure
+            var m = { action: "loadTile", accessToken: accessToken, height: h, width: w};
+            message = JSON.stringify(m);
+
+            // push the message.
+            var iframe = document.getElementById('iFrameEmbedTile');
+            iframe.contentWindow.postMessage(message, "*");;
+        }
+    </script>
+    <style>
+        /*.selectDiv {
+            display:none;
+        }
+        .selectDiv:hover {
+            display:block;
+        }*/
+    </style>
+</head>
+<body class="selectDiv">
+    <div>
+        <select id="selectTile">
+        @foreach(var tile in Model.value)
+        {
+        <option value="@tile.embedUrl">
+            @tile.title
+        </option>
+        }
+        </select>
+    </div>
+    <div>
+        <iframe id="iFrameEmbedTile" width="650" height="320" src="" frameborder="0" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes"></iframe>
+    </div>
+    </body>
+</html>

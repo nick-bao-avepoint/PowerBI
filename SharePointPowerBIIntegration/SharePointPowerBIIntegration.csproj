@@ -22,6 +22,7 @@
     <WorkflowPartId>{72a61510-7710-4fc8-be28-fd93a3b77c69}</WorkflowPartId>
     <CspkgPartId>{efbb849b-85fd-40f0-8d58-404ace1fb5a2}</CspkgPartId>
     <SqlPackagePartId>{3e34d073-7440-4949-8f4d-c1eda5e6feda}</SqlPackagePartId>
+    <ActivePublishProfile>NickSharePointAddin - Web Deploy</ActivePublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,6 +47,12 @@
     <Content Include="AppIcon.png">
       <OpcRelationship>manifest-icon</OpcRelationship>
     </Content>
+    <Content Include="Power BI Tile\Elements.xml">
+      <OpcRelationship>feature-elementmanifest</OpcRelationship>
+    </Content>
+    <Content Include="PowerBIAppPart\Elements.xml">
+      <OpcRelationship>feature-elementmanifest</OpcRelationship>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <AppManifestFile Include="AppManifest.xml">
@@ -62,6 +69,15 @@
       <RoleName>SharePointPowerBIIntegrationWeb</RoleName>
       <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Power BI Tile\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{6c67f806-3bfe-47cd-8758-4baf93a23a31}</SharePointProjectItemId>
+    </None>
+    <None Include="PowerBIAppPart\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{7d040768-0da9-45ab-afb3-1c479d37c5ef}</SharePointProjectItemId>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

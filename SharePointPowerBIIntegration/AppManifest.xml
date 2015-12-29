@@ -8,10 +8,10 @@
 >
   <Properties>
     <Title>SharePointPowerBIIntegration</Title>
-    <StartPage>~remoteAppUrl/?{StandardTokens}</StartPage>
+    <StartPage>https://nicksharepointaddin.azurewebsites.net/home/dashboard?{StandardTokens}</StartPage>
   </Properties>
 
   <AppPrincipal>
-    <RemoteWebApplication ClientId="*" />
+    <RemoteWebApplication ClientId="971996d9-f033-455c-a69b-7ee7c1d6de02" />
   </AppPrincipal>
 </App>
